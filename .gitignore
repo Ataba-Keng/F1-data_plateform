@@ -1,0 +1,57 @@
+# Environnement et Secrets
+.env
+*.env
+.env.*
+
+# Environnements virtuels Python
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs et caches Airflow / Docker
+logs/
+target/
+*.log
+.pytest_cache/
+
+# dbt
+dbt_f1/logs/
+dbt_f1/target/
+dbt_f1/dbt_packages/
+
+# Données brutes locales temporaires
+*.csv
+*.json
+!dbt_project.yml
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json

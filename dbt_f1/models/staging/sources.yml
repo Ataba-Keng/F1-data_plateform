@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: raw_f1
+    schema: raw
+    tables:
+      - name: meetings
+      - name: sessions
+      - name: drivers

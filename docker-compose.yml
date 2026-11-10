@@ -1,0 +1,59 @@
+x-airflow-common: &airflow-common
+  build: .
+  environment:
+    - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+    - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://f1_admin:keng96837671@f1-postgres:5432/f1_db
+    - AIRFLOW__CORE__FERNET_KEY=46BKJoQYlPPOexq0OhDZnIlNepKFf87WFwLbfzqnvq8=
+    - AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION=true
+    - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+    - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-us-east-1}
+    - AWS_ENDPOINT_URL=${AWS_ENDPOINT_URL}
+    - DBT_ALLOW_EXPERIMENTAL_ADAPTERS=true
+    - S3_RAW_BUCKET=f1-data-platform-raw-dev
+    - DBT_RDS_HOST=f1-postgres
+    - DBT_RDS_USER=f1_admin
+    - DBT_RDS_PASSWORD=keng96837671
+    - DBT_RDS_DB=f1_db
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./scripts:/opt/airflow/scripts
+    - ./dbt_f1:/opt/airflow/dbt_f1
+  networks:
+    - f1-network
+
+services:
+  airflow-init:
+    <<: *airflow-common
+    container_name: airflow-init
+    command: version
+    entrypoint: >
+      bash -c "
+      airflow db migrate &&
+      airflow users create --username admin --password admin --firstname Keng --lastname Data --role Admin --email admin@example.com || true
+      "
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: airflow-webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    restart: always
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: airflow-scheduler
+    command: scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+    restart: always
+
+networks:
+  f1-network:
+    external: true
